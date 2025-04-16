@@ -141,7 +141,7 @@
     }
   
     button {
-      @apply hover:cursor-pointer bg-rose-600 hover:bg-rose-700;
+      @apply hover:cursor-pointer bg-rose-600 hover:bg-gradient-to-r hover:from-rose-600 hover:to-rose-700 text-white;
     }
   }
 
