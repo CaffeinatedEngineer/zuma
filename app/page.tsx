@@ -1,9 +1,9 @@
-import {Button} from "@/components/ui/button";
+import HeroSection from "@/components/Home/hero-section";
 
 export default function Home() {
   return (
-    <div className="">
-    <Button  variant='ghost' size={'lg'}>Shadcn Button</Button>
+    <div className="relative w-full">
+      <HeroSection/>
     </div>
   );
 }
