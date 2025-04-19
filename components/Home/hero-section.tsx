@@ -47,7 +47,7 @@ export default function HeroSection(){
     font-bold shadow-lg transition-all duration-200"
 >
   <Link href="/#pricing" className="flex gap-2 items-center">
-    <span>Try Sommaire</span>
+    <span>Try Zuma AI</span>
     <ArrowRight className="animate-pulse" />
   </Link>
 </Button>
