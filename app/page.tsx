@@ -1,12 +1,17 @@
 import HeroSection from "@/components/Home/hero-section";
 import BgGradient from "@/components/common/bg-gradient";
+import DemoSection from "@/components/Home/demo-section";
+import HowItWorksSection from "@/components/Home/how-it-works-section";
 
 export default function Home() {
   return (
     <div className="relative w-full">
       <BgGradient/>
       <div className="flex flex-col">
-      <HeroSection/></div>
+      <HeroSection/>
+      <DemoSection/>
+      </div>
+      <HowItWorksSection/>
     </div>
   );
 }
