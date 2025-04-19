@@ -4,10 +4,7 @@ import NavLink from "./nav-link";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 
-
 export default function Header() {
-  
-
   return (
     <nav
       className="container flex items-center justify-between py-4 lg:px-8 px-2 mx-auto"
@@ -29,30 +26,24 @@ export default function Header() {
       <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
         <NavLink href="/#pricing">Pricing</NavLink>
         <SignedIn>
-        <NavLink href="/#dashboard">Your Summaries</NavLink>
+          <NavLink href="/#dashboard">Your Summaries</NavLink>
         </SignedIn>
       </div>
 
       <div className="flex lg:justify-end lg:flex-1">
         <SignedIn>
-        <div className="flex gap-2 items-center">
-          
+          <div className="flex gap-2 items-center">
             <NavLink href="/upload" className="">
               Upload a PDF
             </NavLink>
             <div>Pro</div>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-            </div>
-            </SignedIn>
-          
-        
-            
-            <SignedOut>
-            <NavLink href="/#signin">Sign In</NavLink>
-          </SignedOut>
-      
+            <UserButton />
+          </div>
+        </SignedIn>
+
+        <SignedOut>
+          <NavLink href="/#signin">Sign In</NavLink>
+        </SignedOut>
       </div>
     </nav>
   );
