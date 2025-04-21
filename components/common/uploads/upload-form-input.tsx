@@ -18,7 +18,7 @@ export default function UploadFormInput({ onSubmit }: UploadFormInputProps) {
           required
           className=""
         />
-        <Button>Upload your PDF</Button>
+        <Button variant={"ghost"} className="rounded-xl">Upload your PDF</Button>
       </div>
     </form>
   );
