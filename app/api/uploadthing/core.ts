@@ -13,7 +13,7 @@ export const  ourFileRouter = {
         return { userId: user.id };
     }).onUploadComplete(async ({metadata, file}) => {
             console.log("File uploaded", metadata.userId);
-            console.log("File url", file.url);
+            console.log("File url", file);
             // Perform any necessary operations here, but do not return incompatible objects
             return; // Ensure the function returns void
         }
