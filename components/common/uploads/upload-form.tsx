@@ -1,9 +1,11 @@
 'use client';
 
+import { generatePDFSummary } from "@/actions/upload-action";
 import UploadFormInput from "@/components/common/uploads/upload-form-input";
 import { useUploadThing } from "@/utils/uploadthing";
 import { toast } from "sonner"; // Correctly import toast from sonner
 import { z } from "zod";
+
 
 const schema = z.object({
   file: z
@@ -68,6 +70,9 @@ export default function UploadForm() {
 
     // Additional logic: parse the PDF, summarize it, save to database, etc.
     console.log("File uploaded successfully:", resp);
+
+    const summary = await generatePDFSummary(resp);
+    console.log({summary});
   };
 
   return (
