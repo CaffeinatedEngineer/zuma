@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.16.0",
+    "@langchain/community": "^0.3.44",
+    "@langchain/core": "^0.3.57",
     "@radix-ui/react-slot": "^1.2.0",
     "@uploadthing/react": "^7.3.0",
     "class-variance-authority": "^0.7.1",
@@ -17,6 +19,7 @@
     "lucide-react": "^0.488.0",
     "next": "15.3.0",
     "next-themes": "^0.4.6",
+    "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sonner": "^2.0.3",
