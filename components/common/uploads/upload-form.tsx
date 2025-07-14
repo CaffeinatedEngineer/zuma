@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
 import { generatePDFSummary } from "@/actions/upload-action";
 import UploadFormInput from "@/components/common/uploads/upload-form-input";
 import { useUploadThing } from "@/utils/uploadthing";
 import { toast } from "sonner"; // Correctly import toast from sonner
 import { z } from "zod";
-
 
 const schema = z.object({
   file: z
@@ -24,7 +23,9 @@ export default function UploadForm() {
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
       console.log("Uploaded successfully!");
-      toast.success("✅ Upload Complete: Your file has been uploaded successfully.");
+      toast.success(
+        "✅ Upload Complete: Your file has been uploaded successfully."
+      );
     },
     onUploadError: (err) => {
       console.error("Error occurred while uploading", err);
@@ -51,13 +52,14 @@ export default function UploadForm() {
         validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid file"
       );
       toast.error(
-        validatedFields.error.flatten().fieldErrors.file?.[0] ??
-          "Invalid file"
+        validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid file"
       );
       return;
     }
 
-    toast.info("📄 Processing PDF... Hang tight! Your file is being processed.");
+    toast.info(
+      "📄 Processing PDF... Hang tight! Your file is being processed."
+    );
 
     // Upload the file to UploadThing
     const resp = await startUpload([file]);
@@ -66,13 +68,15 @@ export default function UploadForm() {
       return;
     }
 
-    toast.success("✅ Upload Successful: Your PDF has been uploaded successfully.");
+    toast.success(
+      "✅ Upload Successful: Your PDF has been uploaded successfully."
+    );
 
     // Additional logic: parse the PDF, summarize it, save to database, etc.
     console.log("File uploaded successfully:", resp);
 
     const summary = await generatePDFSummary(resp);
-    console.log({summary});
+    console.log({ summary });
   };
 
   return (
