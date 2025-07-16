@@ -1,16 +1,17 @@
 "use client";
 
-import { generatePDFSummary } from "@/actions/upload-action";
-import UploadFormInput from "@/components/common/uploads/upload-form-input";
-import { useUploadThing } from "@/utils/uploadthing";
-import { toast } from "sonner"; // Correctly import toast from sonner
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
+import { useUploadThing } from "@/utils/uploadthing";
+import UploadFormInput from "@/components/common/uploads/upload-form-input";
+import { generatePDFSummary } from "@/actions/upload-action";
 
 const schema = z.object({
   file: z
     .instanceof(File, { message: "Invalid file type" })
     .refine(
-      (file) => file.size <= 20 * 1024 * 1024, // 20MB limit
+      (file) => file.size <= 20 * 1024 * 1024,
       "File size must be less than 20MB"
     )
     .refine(
@@ -20,6 +21,9 @@ const schema = z.object({
 });
 
 export default function UploadForm() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
       console.log("Uploaded successfully!");
@@ -30,6 +34,8 @@ export default function UploadForm() {
     onUploadError: (err) => {
       console.error("Error occurred while uploading", err);
       toast.error("❌ Upload Failed: An error occurred during upload.");
+      formRef.current?.reset();
+      setIsLoading(false);
     },
     onUploadBegin: (fileName: string) => {
       console.log("Upload has begun for", fileName);
@@ -39,49 +45,64 @@ export default function UploadForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    console.log("Form submitted");
-    const formData = new FormData(e.currentTarget);
-    const file = formData.get("file") as File;
+    try {
+      console.log("Form submitted");
+      const formData = new FormData(e.currentTarget);
+      const file = formData.get("file") as File;
 
-    // Validate the fields
-    const validatedFields = schema.safeParse({ file });
+      const validatedFields = schema.safeParse({ file });
+      if (!validatedFields.success) {
+        const errorMsg =
+          validatedFields.error.flatten().fieldErrors.file?.[0] ??
+          "Invalid file";
+        toast.error(errorMsg);
+        formRef.current?.reset();
+        setIsLoading(false);
+        return;
+      }
 
-    if (!validatedFields.success) {
-      console.log(
-        validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid file"
+      toast.info(
+        "📄 Processing PDF... Hang tight! Your file is being processed."
       );
-      toast.error(
-        validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid file"
+      const resp = await startUpload([file]);
+
+      if (!resp) {
+        toast.error("❌ Something went wrong: Error uploading file.");
+        formRef.current?.reset();
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success(
+        "✅ Upload Successful: Your PDF has been uploaded successfully."
       );
-      return;
+      console.log("File uploaded successfully:", resp);
+
+      const result = await generatePDFSummary(resp);
+      const { data = null } = result || {};
+
+      if (data) {
+        toast("📄 Saving PDF... Hang tight, we are saving your summary");
+        formRef.current?.reset();
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("❌ Something went wrong: Unexpected error occurred.");
+      formRef.current?.reset();
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.info(
-      "📄 Processing PDF... Hang tight! Your file is being processed."
-    );
-
-    // Upload the file to UploadThing
-    const resp = await startUpload([file]);
-    if (!resp) {
-      toast.error("❌ Something went wrong: Error uploading file.");
-      return;
-    }
-
-    toast.success(
-      "✅ Upload Successful: Your PDF has been uploaded successfully."
-    );
-
-    // Additional logic: parse the PDF, summarize it, save to database, etc.
-    console.log("File uploaded successfully:", resp);
-
-    const summary = await generatePDFSummary(resp);
-    console.log({ summary });
   };
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
-      <UploadFormInput onSubmit={handleSubmit} />
+      <UploadFormInput
+        ref={formRef}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
