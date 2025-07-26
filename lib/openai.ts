@@ -1,12 +1,27 @@
 import { SUMMARY_SYSTEM_PROMPT } from "@/utils/prompts";
 import OpenAI from "openai";
+import { rateLimiter, RATE_LIMITS } from './rate-limiter';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function generateSummaryFromOpenAI(pdfText: string) {
+  // Check rate limit before making request
+  const { maxCalls, windowMs } = RATE_LIMITS.OPENAI_FREE;
+  if (!rateLimiter.canMakeRequest('openai', maxCalls, windowMs)) {
+    const nextAvailable = rateLimiter.getNextAvailableTime('openai', maxCalls, windowMs);
+    const waitTime = Math.max(0, nextAvailable - Date.now());
+    
+    if (waitTime > 0) {
+      console.warn(`OpenAI rate limit reached. Waiting ${Math.ceil(waitTime / 1000)} seconds...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+  }
+  
   try {
+    // Record the API call
+    rateLimiter.recordCall('openai');
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
