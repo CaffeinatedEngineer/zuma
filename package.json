@@ -13,6 +13,7 @@
     "@google/generative-ai": "^0.24.1",
     "@langchain/community": "^0.3.44",
     "@langchain/core": "^0.3.57",
+    "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-slot": "^1.2.0",
     "@uploadthing/react": "^7.3.0",
     "class-variance-authority": "^0.7.1",
