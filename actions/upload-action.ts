@@ -3,7 +3,18 @@ import { generateSummaryFromOpenAI } from "@/lib/openai";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateSummaryFromGemini } from "@/lib/geminiai";
 import { generateBasicSummary } from "@/lib/fallback-summary";
+import { auth } from "@clerk/nextjs/server";
+import { getDbConnection } from "@/lib/db";
+import { formatFileNameAsTitle } from "@/utils/format-utils";
 
+
+interface PdfSummaryType {
+  userID?: string;
+  fileUrl: string;
+  summary: string;
+  title: string;
+  fileName: string;
+}
 export async function generatePDFSummary(
   uploadResponse: { url: string; name: string }[] | null
 ) {
@@ -84,10 +95,18 @@ export async function generatePDFSummary(
         data: null,
       };
     }
+
+    const formattedfileName = formatFileNameAsTitle(fileName);
+
+
     return {
       success: true,
       message: "summary generated",
-      data: summary,
+      data: {
+        title: fileName,
+
+        summary,
+      },
     };
   } catch (err) {
     console.error('PDF summary generation failed:', err);
@@ -95,6 +114,92 @@ export async function generatePDFSummary(
       success: false,
       message: err instanceof Error ? err.message : "Summary generation failed",
       data: null,
+    };
+  }
+}
+
+async function savedPdfsummary({userID , fileUrl ,summary , title,
+  fileName
+}:{
+  userID: string;
+  fileUrl: string;
+  summary: string;
+  title: string;
+  fileName: string;
+}){
+  try{
+    const sql = await getDbConnection();
+    await sql`INSERT INTO pdf_summaries (
+    user_id,
+    original_file_url,
+    summary_text,
+    title,
+    file_name
+) VALUES (
+    ${userID},
+    ${fileUrl},
+    ${summary},
+    ${title},
+    ${fileName}
+
+);`;
+
+  }catch(error){
+    console.error('Error saving PDF summary:', error);
+    throw error;
+  }
+}
+
+export async function storePDFSummary({
+      
+      fileUrl,
+      summary,
+      title,
+      fileName,
+
+    }:PdfSummaryType){
+
+  // user is logged in and has a user id
+  //save pdf summary
+  // save pdf summary
+
+  let Savedsummary: any;
+  try{
+    const  { userId } = await auth();
+    if(!userId){
+      return{
+        success: false,
+        message: "User not authenticated",
+      };
+    }
+    Savedsummary = await savedPdfsummary({
+      userID: userId,
+      fileUrl,
+      summary,
+      title,
+      fileName,
+
+    });
+    if(!Savedsummary){
+      return{
+        success: false,
+        message: "Error storing summary",
+      };
+    }
+
+    return {
+      success: true,
+      message: "summary stored",
+    }
+
+
+  } catch(error){
+    return{
+      success: false,
+      message: error instanceof Error ? error.message :
+         "Error storing summary",
+
+      
     };
   }
 }
