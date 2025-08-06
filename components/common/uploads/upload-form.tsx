@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useUploadThing } from "@/utils/uploadthing";
 import UploadFormInput from "@/components/common/uploads/upload-form-input";
-import { generatePDFSummary } from "@/actions/upload-action";
+import { generatePDFSummary, storePDFSummary } from "@/actions/upload-action";
 
 const schema = z.object({
   file: z
@@ -86,6 +86,15 @@ export default function UploadForm() {
       if (data) {
         toast("📄 Saving PDF... Hang tight, we are saving your summary");
         formRef.current?.reset();
+        if (data.summary){
+          await storePDFSummary({
+            summary: data.summary,
+            fileUrl: resp[0].url, // Changed from resp[0].serverData.file.url
+            title: data.title,
+            fileName: file.name,
+          });
+
+        }
       }
     } catch (err) {
       console.error("Unexpected error:", err);
