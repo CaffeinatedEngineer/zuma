@@ -84,15 +84,18 @@ export default function UploadForm() {
       const { data = null } = result || {};
 
       if (data) {
+        let storeResult : any;
         toast("📄 Saving PDF... Hang tight, we are saving your summary");
-        formRef.current?.reset();
+        
         if (data.summary){
-          await storePDFSummary({
+          storeResult = await storePDFSummary({
             summary: data.summary,
             fileUrl: resp[0].url, // Changed from resp[0].serverData.file.url
             title: data.title,
             fileName: file.name,
           });
+          toast.success("✅ PDF Summary Generated: Your summary has been saved.");
+          formRef.current?.reset();
 
         }
       }
