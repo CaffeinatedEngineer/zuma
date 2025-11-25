@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight } from "lucide-react";
 export default function HeroSection() {
   return (
-    <section
+    <section id="hero"
       className="relative mx-auto flex flex-col z-0
       items-center justify-center py-16 sm:py-20 lg:pb-28
       transition-all animate-in lg:px-12 max-w-7xl"
